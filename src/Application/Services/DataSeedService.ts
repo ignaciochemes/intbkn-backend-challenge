@@ -149,7 +149,7 @@ export class DataSeedService implements OnModuleInit {
                 {
                     uuid: uuidv4(),
                     amount: 25000.50,
-                    companyUuid: "", // Se asignará dinámicamente
+                    companyUuid: "",
                     debitAccount: "123456789012",
                     creditAccount: "098765432109",
                     transferDate: lastMonth.toISOString(),
@@ -162,7 +162,7 @@ export class DataSeedService implements OnModuleInit {
                 {
                     uuid: uuidv4(),
                     amount: 35000.00,
-                    companyUuid: "", // Se asignará dinámicamente
+                    companyUuid: "",
                     debitAccount: "234567890123",
                     creditAccount: "456789012345",
                     transferDate: lastMonth.toISOString(),
@@ -175,7 +175,7 @@ export class DataSeedService implements OnModuleInit {
                 {
                     uuid: uuidv4(),
                     amount: 42000.00,
-                    companyUuid: "", // Se asignará dinámicamente
+                    companyUuid: "",
                     debitAccount: "345678901234",
                     creditAccount: "678901234567",
                     transferDate: twoMonthsAgo.toISOString(),

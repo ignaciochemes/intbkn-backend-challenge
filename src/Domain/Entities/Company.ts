@@ -40,7 +40,6 @@ export class Company {
 
     public setCuit(cuit: string): void {
         this.cuit = cuit;
-        // Formateamos el CUIT si no tiene el formato correcto
         if (this.cuit && !this.cuit.includes('-')) {
             this.cuit = `${this.cuit.substring(0, 2)}-${this.cuit.substring(2, 10)}-${this.cuit.substring(10, 11)}`;
         }
