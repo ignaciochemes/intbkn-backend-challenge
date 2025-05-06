@@ -149,7 +149,7 @@ export class Transfer {
     }
 
     public setDeletedAt(deletedAt: Date | null): void {
-        this.deletedAt = deletedAt || undefined;
+        this.deletedAt = deletedAt || null;
     }
 
     public validateTransfer(): boolean {

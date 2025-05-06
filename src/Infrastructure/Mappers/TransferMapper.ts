@@ -23,7 +23,7 @@ export class TransferMapper {
         domain.setCurrency(entity.currency);
         domain.setCreatedAt(entity.createdAt);
         domain.setUpdatedAt(entity.updatedAt);
-        domain.setDeletedAt(entity.deletedAt);
+        domain.setDeletedAt(entity.deletedAt || null);
         return domain;
     }
 
