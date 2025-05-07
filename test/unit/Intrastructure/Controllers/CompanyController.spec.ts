@@ -67,13 +67,22 @@ describe('CompanyController', () => {
     });
 
     describe('findAll', () => {
-        it('should return all companies', async () => {
+        it('should return all companies with default pagination', async () => {
+            const companies = [mockCompanyResponseDto()];
+            companyService.findAll.mockResolvedValue(companies);
+            const result = await controller.findAll();
+
+            expect(companyService.findAll).toHaveBeenCalledWith(1, 10);
+            expect(result.result).toEqual(companies);
+        });
+
+        it('should return all companies with custom pagination', async () => {
             const companies = [mockCompanyResponseDto()];
             companyService.findAll.mockResolvedValue(companies);
 
-            const result = await controller.findAll(1, 10);
+            const result = await controller.findAll(2, 20);
 
-            expect(companyService.findAll).toHaveBeenCalledWith(1, 10);
+            expect(companyService.findAll).toHaveBeenCalledWith(2, 20);
             expect(result.result).toEqual(companies);
         });
     });
