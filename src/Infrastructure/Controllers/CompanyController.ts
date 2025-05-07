@@ -7,7 +7,7 @@ import { GenericResponse } from '../../Application/Dtos/GenericResponseDto';
 import { COMPANY_SERVICE } from '../../Shared/Constants/InjectionTokens';
 import { LoggingInterceptor } from '../Interceptors/LoggingInterceptor';
 import ResponseFormatter from '../Formatter/ResponseFormatter';
-import { PaginatedResponseDto } from 'src/Application/Dtos/PaginatedResponseDto';
+import { PaginatedResponseDto } from '../../Application/Dtos/PaginatedResponseDto';
 
 @ApiTags('companies')
 @Controller('companies')

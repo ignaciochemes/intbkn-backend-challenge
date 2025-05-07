@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CompanyResponseDto } from './CompanyResponseDto';
-import { TransferStatus } from 'src/Shared/Enums/TransferStatusEnum';
+import { TransferStatus } from '../../Shared/Enums/TransferStatusEnum';
 
 export class TransferResponseDto {
     @ApiProperty({
