@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { AppModule } from './Infrastructure/Modules/AppModule';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SecurityHeadersMiddleware } from './Infrastructure/Middlewares/SecurityHeadersMiddleware';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -18,23 +19,46 @@ async function bootstrap() {
     );
 
     app.use(helmet());
+    app.use(new SecurityHeadersMiddleware().use);
     app.useBodyParser('json', { limit: '10mb' });
     app.useBodyParser('urlencoded', { extended: true, limit: '10mb' });
     app.setGlobalPrefix('api/v1/backend-challenge');
     app.enableCors({
-        origin: '*',
+        origin: configService.get<string>('CORS_ORIGIN') || '*',
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
+        allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization'
     });
 
     const config = new DocumentBuilder()
         .setTitle('Backend Challenge API')
-        .setDescription('API documentation for the backend challenge')
+        .setDescription(`
+        # API para Gestión de Empresas y Transferencias
+        
+        Esta API proporciona endpoints para la gestión de empresas y transferencias bancarias, 
+        siguiendo los principios de la arquitectura hexagonal.
+        
+        ## Principales Características
+        
+        * Gestión completa de empresas (adhesión, consulta)
+        * Gestión de transferencias entre cuentas
+        * Consultas de empresas por diferentes criterios
+        * Reportes de transferencias por empresa
+    `)
         .setVersion('1.0')
+        .addTag('companies', 'Operaciones relacionadas con empresas')
+        .addTag('transfers', 'Operaciones relacionadas con transferencias')
+        .setLicense('Apache 2.0', 'https://www.apache.org/licenses/LICENSE-2.0')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
 
-    await app.listen(configService.get<number>('PORT') || 33000);
+    const port = configService.get<number>('PORT') || 33000;
+    await app.listen(port);
+    console.log(`Application is running on: http://localhost:${port}`);
 }
 
 bootstrap();

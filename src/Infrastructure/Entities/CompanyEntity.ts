@@ -1,6 +1,10 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('company')
+// Índice compuesto para consultas de adhesión por mes
+@Index('idx_company_adhesion_date_active', ['adhesionDate', 'isActive'])
+// Índice para búsquedas por CUIT
+@Index('idx_company_cuit', ['cuit'], { unique: true })
 export class CompanyEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -13,6 +17,7 @@ export class CompanyEntity {
     cuit: string;
 
     @Column({ nullable: false, length: 50, name: 'business_name' })
+    @Index('idx_company_business_name')
     businessName: string;
 
     @Column({ nullable: false, type: 'timestamp', name: 'adhesion_date' })

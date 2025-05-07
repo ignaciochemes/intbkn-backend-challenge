@@ -7,6 +7,7 @@ import { GenericResponse } from '../../Application/Dtos/GenericResponseDto';
 import { COMPANY_SERVICE } from '../../Shared/Constants/InjectionTokens';
 import { LoggingInterceptor } from '../Interceptors/LoggingInterceptor';
 import ResponseFormatter from '../Formatter/ResponseFormatter';
+import { PaginatedResponseDto } from 'src/Application/Dtos/PaginatedResponseDto';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -25,6 +26,7 @@ export class CompanyController {
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
     @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Company with this CUIT already exists' })
     @ApiBody({ type: CreateCompanyDto })
+    @ApiResponse({ type: GenericResponse })
     async createCompany(
         @Body() data: CreateCompanyDto
     ): Promise<ResponseFormatter<GenericResponse>> {
@@ -39,6 +41,7 @@ export class CompanyController {
     @ApiQuery({ name: 'limit', required: false, description: 'Items per page (default: 10)' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Companies retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No companies found' })
+    @ApiResponse({ type: PaginatedResponseDto<CompanyResponseDto[]>, isArray: true })
     async findAll(
         @Query('page') page: number = 1,
         @Query('limit') limit: number = 10
@@ -53,6 +56,7 @@ export class CompanyController {
     @ApiParam({ name: 'id', description: 'Company ID (numeric or UUID)' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Company retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Company not found' })
+    @ApiResponse({ type: CompanyResponseDto })
     async findById(
         @Param('id') id: string
     ): Promise<ResponseFormatter<CompanyResponseDto>> {
@@ -65,6 +69,7 @@ export class CompanyController {
     @ApiOperation({ summary: 'Get companies that adhered in the last month' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Companies retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No companies found' })
+    @ApiResponse({ type: CompanyResponseDto, isArray: true })
     async findCompaniesAdheringLastMonth(): Promise<ResponseFormatter<CompanyResponseDto[]>> {
         const response: CompanyResponseDto[] = await this.companyService.findCompaniesAdheringLastMonth();
         return ResponseFormatter.create<CompanyResponseDto[]>(response);

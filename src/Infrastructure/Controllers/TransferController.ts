@@ -28,6 +28,7 @@ export class TransferController {
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Company not found' })
     @ApiBody({ type: CreateTransferDto })
+    @ApiResponse({ type: GenericResponse })
     async createTransfer(
         @Body() data: CreateTransferDto
     ): Promise<ResponseFormatter<GenericResponse>> {
@@ -42,6 +43,7 @@ export class TransferController {
     @ApiQuery({ name: 'limit', required: false, description: 'Items per page (default: 10)' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Transfers retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No transfers found' })
+    @ApiResponse({ type: PaginatedResponseDto<TransferResponseDto[]> })
     async findAll(
         @Query() query: FindTransferQueryRequest,
     ): Promise<ResponseFormatter<PaginatedResponseDto<TransferResponseDto>>> {
@@ -55,6 +57,7 @@ export class TransferController {
     @ApiParam({ name: 'id', description: 'Transfer ID (numeric or UUID)' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Transfer retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Transfer not found' })
+    @ApiResponse({ type: TransferResponseDto })
     async findById(
         @Param('id') id: string
     ): Promise<ResponseFormatter<TransferResponseDto>> {
@@ -68,6 +71,7 @@ export class TransferController {
     @ApiParam({ name: 'companyId', description: 'Company ID (numeric or UUID)' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Transfers retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No transfers found' })
+    @ApiResponse({ type: TransferResponseDto, isArray: true })
     async findByCompanyId(
         @Param('companyId') companyId: string
     ): Promise<ResponseFormatter<TransferResponseDto[]>> {
@@ -80,6 +84,7 @@ export class TransferController {
     @ApiOperation({ summary: 'Get companies with transfers in the last month' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Companies retrieved successfully' })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No companies found' })
+    @ApiResponse({ type: CompanyResponseDto, isArray: true })
     async findCompaniesWithTransfersLastMonth(): Promise<ResponseFormatter<CompanyResponseDto[]>> {
         const response: CompanyResponseDto[] = await this.transferService.findCompaniesWithTransfersLastMonth();
         return ResponseFormatter.create<CompanyResponseDto[]>(response);

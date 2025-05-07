@@ -3,6 +3,10 @@ import { CompanyEntity } from "./CompanyEntity";
 import { TransferStatus } from "../../Shared/Enums/TransferStatusEnum";
 
 @Entity('transfer')
+// Índice compuesto para consultas de transferencias por fecha
+@Index('idx_transfer_date_status', ['transferDate', 'status'])
+// Índice para búsquedas de transferencias por compañía y fecha
+@Index('idx_transfer_company_date', ['companyId', 'transferDate'])
 export class TransferEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -26,6 +30,7 @@ export class TransferEntity {
 
     @ManyToOne(() => CompanyEntity, (company) => company.id, { onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'company_id' })
+    @Index('idx_transfer_company_id')
     companyId: CompanyEntity;
 
     @Column({ nullable: false, length: 50, name: 'debit_account' })
@@ -44,12 +49,14 @@ export class TransferEntity {
         default: TransferStatus.PENDING,
         name: 'status'
     })
+    @Index('idx_transfer_status')
     status: TransferStatus;
 
     @Column({ nullable: true, type: 'text', name: 'description' })
     description: string;
 
     @Column({ nullable: true, type: 'text', name: 'reference_id' })
+    @Index('idx_transfer_reference_id')
     referenceId: string;
 
     @Column({ nullable: true, type: 'timestamp', name: 'processed_date' })
