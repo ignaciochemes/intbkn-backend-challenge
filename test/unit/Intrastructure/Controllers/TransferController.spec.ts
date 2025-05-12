@@ -4,29 +4,15 @@ import { TRANSFER_SERVICE } from '../../../../src/Shared/Constants/InjectionToke
 import { TransferResponseDto } from '../../../../src/Application/Dtos/TransferResponseDto';
 import { CompanyResponseDto } from '../../../../src/Application/Dtos/CompanyResponseDto';
 import { CreateTransferDto } from '../../../../src/Application/Dtos/CreateTransferDto';
-import { FindTransferQueryRequest } from '../../../../src/Application/Dtos/FindTransferQueryRequest';
 import { GenericResponse } from '../../../../src/Application/Dtos/GenericResponseDto';
 import { PaginatedResponseDto } from '../../../../src/Application/Dtos/PaginatedResponseDto';
 import { TransferStatus } from '../../../../src/Shared/Enums/TransferStatusEnum';
+import { BaseDto } from '../../../../src/Application/Dtos/BaseDto';
 
-// Mock de la clase BaseDto para que los DTOs hereden correctamente
-jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
-    return {
-        BaseDto: class {
-            sanitizeText(text: string | null | undefined): string | undefined {
-                return text;
-            }
-
-            normalizeIdentifier(text: string | null | undefined): string | undefined {
-                return text;
-            }
-
-            normalizeAccountNumber(account: string | null | undefined): string | undefined {
-                return account;
-            }
-        }
-    };
-});
+class MockFindTransferQueryRequest extends BaseDto {
+    page?: number;
+    limit?: number;
+}
 
 describe('TransferController', () => {
     let controller: TransferController;
@@ -126,7 +112,10 @@ describe('TransferController', () => {
 
             transferService.findAll.mockResolvedValue(paginatedResponse);
 
-            const query: FindTransferQueryRequest = { page: 0, limit: 10 };
+            const query = new MockFindTransferQueryRequest();
+            query.page = 0;
+            query.limit = 10;
+
             const result = await controller.findAll(query);
 
             expect(transferService.findAll).toHaveBeenCalledWith(query);
