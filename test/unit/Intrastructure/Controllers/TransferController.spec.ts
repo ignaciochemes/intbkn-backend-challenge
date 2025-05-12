@@ -7,12 +7,25 @@ import { CreateTransferDto } from '../../../../src/Application/Dtos/CreateTransf
 import { GenericResponse } from '../../../../src/Application/Dtos/GenericResponseDto';
 import { PaginatedResponseDto } from '../../../../src/Application/Dtos/PaginatedResponseDto';
 import { TransferStatus } from '../../../../src/Shared/Enums/TransferStatusEnum';
-import { BaseDto } from '../../../../src/Application/Dtos/BaseDto';
+import { PaginatedQueryRequestDto } from '../../../../src/Application/Dtos/PaginatedQueryRequestDto';
 
-class MockFindTransferQueryRequest extends BaseDto {
-    page?: number;
-    limit?: number;
-}
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
 
 describe('TransferController', () => {
     let controller: TransferController;
@@ -112,7 +125,7 @@ describe('TransferController', () => {
 
             transferService.findAll.mockResolvedValue(paginatedResponse);
 
-            const query = new MockFindTransferQueryRequest();
+            const query = new PaginatedQueryRequestDto();
             query.page = 0;
             query.limit = 10;
 

@@ -7,12 +7,25 @@ import { Transfer } from '../../../../src/Domain/Entities/Transfer';
 import { TransferStatus } from '../../../../src/Shared/Enums/TransferStatusEnum';
 import { CreateTransferDto } from '../../../../src/Application/Dtos/CreateTransferDto';
 import HttpCustomException from '../../../../src/Infrastructure/Exceptions/HttpCustomException';
-import { BaseDto } from '../../../../src/Application/Dtos/BaseDto';
+import { PaginatedQueryRequestDto } from '../../../../src/Application/Dtos/PaginatedQueryRequestDto';
 
-class MockFindTransferQueryRequest extends BaseDto {
-    page?: number;
-    limit?: number;
-}
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
 
 describe('TransferService', () => {
     let service: TransferService;
@@ -181,7 +194,7 @@ describe('TransferService', () => {
 
             transferRepository.findAll.mockResolvedValue([mockTransfers, totalCount]);
 
-            const query = new MockFindTransferQueryRequest();
+            const query = new PaginatedQueryRequestDto();
             query.page = 0;
             query.limit = 10;
 
@@ -195,7 +208,7 @@ describe('TransferService', () => {
         it('should throw exception when no transfers found', async () => {
             transferRepository.findAll.mockResolvedValue([[], 0]);
 
-            const query = new MockFindTransferQueryRequest();
+            const query = new PaginatedQueryRequestDto();
             query.page = 0;
             query.limit = 10;
 

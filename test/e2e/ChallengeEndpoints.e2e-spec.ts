@@ -13,7 +13,11 @@ describe('Challenge Endpoints (e2e)', () => {
             imports: [AppModule],
         }).compile();
         app = moduleFixture.createNestApplication();
-        app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+        app.useGlobalPipes(new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true
+        }));
         app.setGlobalPrefix('api/v1/backend-challenge');
         dataSeedService = moduleFixture.get<DataSeedService>(DataSeedService);
         await dataSeedService['_seedData']();
@@ -98,6 +102,69 @@ describe('Challenge Endpoints (e2e)', () => {
                     expect(res.body.message).toBeInstanceOf(Array);
                     expect((res.body.message as string[]).some((msg: string) => msg.includes('cuit'))).toBeTruthy();
                     expect((res.body.message as string[]).some((msg: string) => msg.includes('businessName'))).toBeTruthy();
+                });
+        });
+    });
+
+    // Pruebas adicionales para los endpoints paginados con el nuevo DTO
+    describe('GET /companies', () => {
+        it('should return paginated companies with default values', () => {
+            return request(app.getHttpServer())
+                .get('/api/v1/backend-challenge/companies')
+                .expect(200)
+                .expect(res => {
+                    expect(res.body).toBeDefined();
+                    expect(res.body.result).toBeDefined();
+                    expect(res.body.result.data).toBeInstanceOf(Array);
+                    expect(res.body.result.pagination).toBeDefined();
+                    expect(res.body.result.pagination.currentPage).toBeDefined();
+                    expect(res.body.result.pagination.pageSize).toBeDefined();
+                    expect(res.body.result.pagination.totalItems).toBeDefined();
+                });
+        });
+
+        it('should return paginated companies with custom pagination', () => {
+            return request(app.getHttpServer())
+                .get('/api/v1/backend-challenge/companies?page=0&limit=5')
+                .expect(200)
+                .expect(res => {
+                    expect(res.body).toBeDefined();
+                    expect(res.body.result).toBeDefined();
+                    expect(res.body.result.data).toBeInstanceOf(Array);
+                    expect(res.body.result.pagination).toBeDefined();
+                    expect(res.body.result.pagination.currentPage).toBe(0);
+                    expect(res.body.result.pagination.pageSize).toBe(5);
+                });
+        });
+    });
+
+    describe('GET /transfers', () => {
+        it('should return paginated transfers with default values', () => {
+            return request(app.getHttpServer())
+                .get('/api/v1/backend-challenge/transfers')
+                .expect(200)
+                .expect(res => {
+                    expect(res.body).toBeDefined();
+                    expect(res.body.result).toBeDefined();
+                    expect(res.body.result.data).toBeInstanceOf(Array);
+                    expect(res.body.result.pagination).toBeDefined();
+                    expect(res.body.result.pagination.currentPage).toBeDefined();
+                    expect(res.body.result.pagination.pageSize).toBeDefined();
+                    expect(res.body.result.pagination.totalItems).toBeDefined();
+                });
+        });
+
+        it('should return paginated transfers with custom pagination', () => {
+            return request(app.getHttpServer())
+                .get('/api/v1/backend-challenge/transfers?page=0&limit=3')
+                .expect(200)
+                .expect(res => {
+                    expect(res.body).toBeDefined();
+                    expect(res.body.result).toBeDefined();
+                    expect(res.body.result.data).toBeInstanceOf(Array);
+                    expect(res.body.result.pagination).toBeDefined();
+                    expect(res.body.result.pagination.currentPage).toBe(0);
+                    expect(res.body.result.pagination.pageSize).toBe(3);
                 });
         });
     });

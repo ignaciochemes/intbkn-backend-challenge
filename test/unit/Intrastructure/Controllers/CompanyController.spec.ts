@@ -4,6 +4,8 @@ import { COMPANY_SERVICE } from '../../../../src/Shared/Constants/InjectionToken
 import { CompanyResponseDto } from '../../../../src/Application/Dtos/CompanyResponseDto';
 import { CreateCompanyDto } from '../../../../src/Application/Dtos/CreateCompanyDto';
 import { GenericResponse } from '../../../../src/Application/Dtos/GenericResponseDto';
+import { PaginatedResponseDto } from '../../../../src/Application/Dtos/PaginatedResponseDto';
+import { PaginatedQueryRequestDto } from '../../../../src/Application/Dtos/PaginatedQueryRequestDto';
 
 // Mock de la clase BaseDto para que los DTOs hereden correctamente
 jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
@@ -88,21 +90,45 @@ describe('CompanyController', () => {
     describe('findAll', () => {
         it('should return all companies with default pagination', async () => {
             const companies = [mockCompanyResponseDto()];
-            companyService.findAll.mockResolvedValue(companies);
-            const result = await controller.findAll();
+            const paginatedResponse = new PaginatedResponseDto(companies, {
+                currentPage: 0,
+                pageSize: 10,
+                totalItems: 1,
+                totalPages: 1,
+                hasNextPage: false,
+                hasPreviousPage: false,
+            });
 
-            expect(companyService.findAll).toHaveBeenCalledWith(1, 10);
-            expect(result.result).toEqual(companies);
+            companyService.findAll.mockResolvedValue(paginatedResponse);
+
+            const queryDto = new PaginatedQueryRequestDto();
+            const result = await controller.findAll(queryDto);
+
+            expect(companyService.findAll).toHaveBeenCalledWith(queryDto);
+            expect(result.result).toEqual(paginatedResponse);
         });
 
         it('should return all companies with custom pagination', async () => {
             const companies = [mockCompanyResponseDto()];
-            companyService.findAll.mockResolvedValue(companies);
+            const paginatedResponse = new PaginatedResponseDto(companies, {
+                currentPage: 2,
+                pageSize: 20,
+                totalItems: 1,
+                totalPages: 1,
+                hasNextPage: false,
+                hasPreviousPage: true,
+            });
 
-            const result = await controller.findAll(2, 20);
+            companyService.findAll.mockResolvedValue(paginatedResponse);
 
-            expect(companyService.findAll).toHaveBeenCalledWith(2, 20);
-            expect(result.result).toEqual(companies);
+            const queryDto = new PaginatedQueryRequestDto();
+            queryDto.page = 2;
+            queryDto.limit = 20;
+
+            const result = await controller.findAll(queryDto);
+
+            expect(companyService.findAll).toHaveBeenCalledWith(queryDto);
+            expect(result.result).toEqual(paginatedResponse);
         });
     });
 

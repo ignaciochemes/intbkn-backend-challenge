@@ -8,7 +8,7 @@ import { COMPANY_SERVICE } from '../../Shared/Constants/InjectionTokens';
 import { LoggingInterceptor } from '../Interceptors/LoggingInterceptor';
 import ResponseFormatter from '../Formatter/ResponseFormatter';
 import { PaginatedResponseDto } from '../../Application/Dtos/PaginatedResponseDto';
-import { PaginatedQueryRequestDto } from 'src/Application/Dtos/PaginatedQueryRequestDto';
+import { PaginatedQueryRequestDto } from '../../Application/Dtos/PaginatedQueryRequestDto';
 
 @ApiTags('companies')
 @Controller('companies')

@@ -52,7 +52,7 @@ export class PaginatedQueryRequestDto extends BaseDto {
     @IsInt({ message: 'The page must be an integer' })
     @Min(0, { message: 'Page number must be at least 0' })
     @Max(1000000, { message: 'Page number cannot exceed 1,000,000' })
-    readonly page?: number;
+    public page?: number;
 
     @ApiPropertyOptional({
         description: 'Número de elementos por página (máximo 100)',
@@ -71,5 +71,5 @@ export class PaginatedQueryRequestDto extends BaseDto {
     @IsInt({ message: 'Limit must be an integer' })
     @Min(1, { message: 'Limit must be at least 1' })
     @Max(100, { message: 'Limit cannot exceed 100' })
-    readonly limit?: number;
+    public limit?: number;
 }

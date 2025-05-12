@@ -5,6 +5,7 @@ import { COMPANY_REPOSITORY } from '../../../../src/Shared/Constants/InjectionTo
 import { Company } from '../../../../src/Domain/Entities/Company';
 import { CreateCompanyDto } from '../../../../src/Application/Dtos/CreateCompanyDto';
 import HttpCustomException from '../../../../src/Infrastructure/Exceptions/HttpCustomException';
+import { PaginatedQueryRequestDto } from '../../../../src/Application/Dtos/PaginatedQueryRequestDto';
 
 // Mock de la clase BaseDto para que los DTOs hereden correctamente
 jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
@@ -158,6 +159,35 @@ describe('CompanyService', () => {
 
             await expect(service.findById('999')).rejects.toThrow(HttpCustomException);
             expect(companyRepository.findById).toHaveBeenCalledWith('999');
+        });
+    });
+
+    describe('findAll', () => {
+        it('should return all companies with pagination', async () => {
+            const companies = [mockCompany()];
+            const totalCount = 1;
+            companyRepository.findAll.mockResolvedValue([companies, totalCount]);
+
+            const queryDto = new PaginatedQueryRequestDto();
+            queryDto.page = 0;
+            queryDto.limit = 10;
+
+            const result = await service.findAll(queryDto);
+
+            expect(companyRepository.findAll).toHaveBeenCalledWith(0, 10);
+            expect(result.data).toHaveLength(1);
+            expect(result.pagination.totalItems).toBe(1);
+        });
+
+        it('should throw exception when no companies found', async () => {
+            companyRepository.findAll.mockResolvedValue([[], 0]);
+
+            const queryDto = new PaginatedQueryRequestDto();
+            queryDto.page = 0;
+            queryDto.limit = 10;
+
+            await expect(service.findAll(queryDto)).rejects.toThrow(HttpCustomException);
+            expect(companyRepository.findAll).toHaveBeenCalledWith(0, 10);
         });
     });
 });
