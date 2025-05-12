@@ -10,6 +10,8 @@ import { ICompanyService } from '../../Domain/Services/ICompanyService';
 import { COMPANY_REPOSITORY } from '../../Shared/Constants/InjectionTokens';
 import { GenericResponse } from '../Dtos/GenericResponseDto';
 import HttpCustomException from '../../Infrastructure/Exceptions/HttpCustomException';
+import { IPaginationMetadata, PaginatedResponseDto } from '../Dtos/PaginatedResponseDto';
+import { PaginatedQueryRequestDto } from '../Dtos/PaginatedQueryRequestDto';
 
 @Injectable()
 export class CompanyService implements ICompanyService {
@@ -67,17 +69,32 @@ export class CompanyService implements ICompanyService {
         }
     }
 
-    async findAll(page = 1, limit = 10): Promise<CompanyResponseDto[]> {
-        this._logger.log(`Fetching all companies - page: ${page}, limit: ${limit}`);
+    async findAll(query: PaginatedQueryRequestDto): Promise<PaginatedResponseDto<CompanyResponseDto>> {
+        this._logger.log(`Fetching all companies - page: ${query.page}, limit: ${query.limit}`);
         try {
-            const skip = (page - 1) * limit;
-            const companies: Company[] = await this.companyRepository.findAll(skip, limit);
+            const page = query.page ? parseInt(query.page.toString(), 10) : 0;
+            const limit = query.limit ? parseInt(query.limit.toString(), 10) : 10;
+
+            const [companies, totalItems] = await this.companyRepository.findAll(page, limit);
 
             if (!companies || companies.length === 0) {
                 throw new HttpCustomException('No companies found', StatusCodeEnums.NOT_COMPANIES_FOUND);
             }
 
-            return companies.map(company => this._mapToDto(company));
+            const totalPages = Math.ceil(totalItems / limit);
+            const paginationMetadata: IPaginationMetadata = {
+                currentPage: page,
+                pageSize: limit,
+                totalItems: totalItems,
+                totalPages: totalPages,
+                hasNextPage: page < totalPages - 1,
+                hasPreviousPage: page > 0
+            };
+
+            return new PaginatedResponseDto(
+                companies.map(company => this._mapToDto(company)),
+                paginationMetadata
+            );
         } catch (error) {
             this._logger.error(`Error finding all companies: ${error.message}`, error.stack);
             throw error;

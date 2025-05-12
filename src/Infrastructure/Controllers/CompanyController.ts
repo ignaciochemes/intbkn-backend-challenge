@@ -8,6 +8,7 @@ import { COMPANY_SERVICE } from '../../Shared/Constants/InjectionTokens';
 import { LoggingInterceptor } from '../Interceptors/LoggingInterceptor';
 import ResponseFormatter from '../Formatter/ResponseFormatter';
 import { PaginatedResponseDto } from '../../Application/Dtos/PaginatedResponseDto';
+import { PaginatedQueryRequestDto } from 'src/Application/Dtos/PaginatedQueryRequestDto';
 
 @ApiTags('companies')
 @Controller('companies')
@@ -43,11 +44,10 @@ export class CompanyController {
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No companies found' })
     @ApiResponse({ type: PaginatedResponseDto<CompanyResponseDto[]>, isArray: true })
     async findAll(
-        @Query('page') page: number = 1,
-        @Query('limit') limit: number = 10
-    ): Promise<ResponseFormatter<CompanyResponseDto[]>> {
-        const response: CompanyResponseDto[] = await this.companyService.findAll(page, limit);
-        return ResponseFormatter.create<CompanyResponseDto[]>(response);
+        @Query() query: PaginatedQueryRequestDto,
+    ): Promise<ResponseFormatter<PaginatedResponseDto<CompanyResponseDto>>> {
+        const response: PaginatedResponseDto<CompanyResponseDto> = await this.companyService.findAll(query);
+        return ResponseFormatter.create<PaginatedResponseDto<CompanyResponseDto>>(response);
     }
 
     @Get(':id')

@@ -19,16 +19,23 @@ export class CompanyRepository implements ICompanyRepository {
         return CompanyMapper.toDomain(savedEntity);
     }
 
-    async findAll(skip = 0, take = 10): Promise<Company[]> {
-        const entities = await this.companyRepository
-            .createQueryBuilder('company')
-            .where('company.deleted_at IS NULL')
-            .orderBy('company.created_at', 'DESC')
-            .skip(skip)
-            .take(take)
-            .getMany();
+    async findAll(
+        page: number | string = 0,
+        limit: number | string = 10
+    ): Promise<[Company[], number]> {
+        const pageNum = typeof page === 'string' ? parseInt(page, 10) : page;
+        const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : limit;
 
-        return entities.map(entity => CompanyMapper.toDomain(entity));
+        const [entities, count] = await this.companyRepository.findAndCount({
+            where: { deletedAt: null },
+            relations: ['companyId'],
+            order: { createdAt: 'DESC' },
+            skip: pageNum * limitNum,
+            take: limitNum
+        });
+
+        const companies = entities.map(entity => CompanyMapper.toDomain(entity));
+        return [companies, count];
     }
 
     async count(): Promise<number> {

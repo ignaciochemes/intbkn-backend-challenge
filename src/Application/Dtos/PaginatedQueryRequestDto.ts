@@ -35,7 +35,7 @@ export function IsStrictlyNumeric(validationOptions?: ValidationOptions) {
     };
 }
 
-export class FindTransferQueryRequest extends BaseDto {
+export class PaginatedQueryRequestDto extends BaseDto {
     @ApiPropertyOptional({
         description: 'Número de página para paginación (comenzando desde 0)',
         example: 0,

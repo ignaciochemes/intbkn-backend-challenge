@@ -3,7 +3,6 @@ import { DataSource } from 'typeorm';
 import { ITransferRepository } from '../../Domain/Ports/Repositories/ITransferRepository';
 import { ICompanyRepository } from '../../Domain/Ports/Repositories/ICompanyRepository';
 import { CreateTransferDto } from '../Dtos/CreateTransferDto';
-import { FindTransferQueryRequest } from '../Dtos/FindTransferQueryRequest';
 import { TransferResponseDto } from '../Dtos/TransferResponseDto';
 import { CompanyResponseDto } from '../Dtos/CompanyResponseDto';
 import { PaginatedResponseDto, IPaginationMetadata } from '../Dtos/PaginatedResponseDto';
@@ -16,6 +15,7 @@ import HttpCustomException from '../../Infrastructure/Exceptions/HttpCustomExcep
 import { Transfer } from '../../Domain/Entities/Transfer';
 import { TransferStatus } from '../../Shared/Enums/TransferStatusEnum';
 import { Company } from '../../Domain/Entities/Company';
+import { PaginatedQueryRequestDto } from '../Dtos/PaginatedQueryRequestDto';
 
 @Injectable()
 export class TransferService implements ITransferService {
@@ -86,7 +86,7 @@ export class TransferService implements ITransferService {
         }
     }
 
-    async findAll(query: FindTransferQueryRequest): Promise<PaginatedResponseDto<TransferResponseDto>> {
+    async findAll(query: PaginatedQueryRequestDto): Promise<PaginatedResponseDto<TransferResponseDto>> {
         this._logger.log(`Fetching all transfers - page: ${query.page}, limit: ${query.limit}`);
         try {
             const page = query.page ? parseInt(query.page.toString(), 10) : 0;

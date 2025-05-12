@@ -2,7 +2,6 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Post, Query
 import { ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ITransferService } from '../../Domain/Services/ITransferService';
 import { CreateTransferDto } from '../../Application/Dtos/CreateTransferDto';
-import { FindTransferQueryRequest } from '../../Application/Dtos/FindTransferQueryRequest';
 import { TransferResponseDto } from '../../Application/Dtos/TransferResponseDto';
 import { CompanyResponseDto } from '../../Application/Dtos/CompanyResponseDto';
 import { GenericResponse } from '../../Application/Dtos/GenericResponseDto';
@@ -10,6 +9,7 @@ import { PaginatedResponseDto } from '../../Application/Dtos/PaginatedResponseDt
 import { TRANSFER_SERVICE } from '../../Shared/Constants/InjectionTokens';
 import { LoggingInterceptor } from '../Interceptors/LoggingInterceptor';
 import ResponseFormatter from '../Formatter/ResponseFormatter';
+import { PaginatedQueryRequestDto } from 'src/Application/Dtos/PaginatedQueryRequestDto';
 
 @ApiTags('transfers')
 @Controller('transfers')
@@ -45,9 +45,9 @@ export class TransferController {
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No transfers found' })
     @ApiResponse({ type: PaginatedResponseDto<TransferResponseDto[]> })
     async findAll(
-        @Query() query: FindTransferQueryRequest,
+        @Query() query: PaginatedQueryRequestDto,
     ): Promise<ResponseFormatter<PaginatedResponseDto<TransferResponseDto>>> {
-        const response = await this.transferService.findAll(query);
+        const response: PaginatedResponseDto<TransferResponseDto> = await this.transferService.findAll(query);
         return ResponseFormatter.create(response);
     }
 
