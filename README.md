@@ -157,6 +157,10 @@ docker run -p 33000:33000 --env-file .env.local backend-challenge
 - **processedDate**: Fecha de procesamiento
 - **currency**: Código de moneda
 
+## Changelog
+
+Para ver el historial detallado de cambios del proyecto, consulta el [CHANGELOG](./CHANGELOG.md).
+
 ## 📝 Documentación de API
 
 La documentación de la API está disponible a través de Swagger UI en:
