@@ -42,6 +42,9 @@ if [ ! -f ".env" ]; then
   cp .env.example .env
 fi
 
+echo -e "${YELLOW}Running migrations...${NC}"
+npm run typeorm:local migration:run
+
 sed -i 's/DATABASE_HOST=localhost/DATABASE_HOST=localhost/g' .env.local
 sed -i 's/DATABASE_USER=backend-challenge/DATABASE_USER=bchallenge/g' .env.local
 sed -i 's/DATABASE_PASS=backend-challenge/DATABASE_PASS=bchallenge/g' .env.local

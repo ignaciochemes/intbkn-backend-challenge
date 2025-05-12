@@ -1,6 +1,8 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('company')
+// Índice simple para consultas por fecha
+@Index('idx_company_adhesion_date', ['adhesionDate'])
 // Índice compuesto para consultas de adhesión por mes
 @Index('idx_company_adhesion_date_active', ['adhesionDate', 'isActive'])
 // Índice para búsquedas por CUIT

@@ -3,6 +3,8 @@ import { CompanyEntity } from "./CompanyEntity";
 import { TransferStatus } from "../../Shared/Enums/TransferStatusEnum";
 
 @Entity('transfer')
+// Índice simple por fecha
+@Index('idx_transfer_date', ['transferDate'])
 // Índice compuesto para consultas de transferencias por fecha
 @Index('idx_transfer_date_status', ['transferDate', 'status'])
 // Índice para búsquedas de transferencias por compañía y fecha

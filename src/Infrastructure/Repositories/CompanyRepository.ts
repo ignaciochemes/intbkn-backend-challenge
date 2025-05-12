@@ -62,15 +62,18 @@ export class CompanyRepository implements ICompanyRepository {
     }
 
     async findCompaniesAdheringLastMonth(): Promise<Company[]> {
-        const today = new Date();
-        const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-
+        // Consulta optimizada usando índices
         const entities = await this.companyRepository
             .createQueryBuilder('company')
-            .where('company.adhesion_date >= :startDate', { startDate: firstDayOfLastMonth })
-            .andWhere('company.adhesion_date < :endDate', { endDate: firstDayOfCurrentMonth })
+            .select('company')
+            .where(`
+                company.adhesion_date >= date_trunc('month', now()) - interval '1 month' AND 
+                company.adhesion_date < date_trunc('month', now())    
+            `)
             .andWhere('company.deleted_at IS NULL')
+            .andWhere('company.is_active = :isActive', { isActive: true })
+            .orderBy('company.adhesion_date', 'DESC')
+            .cache(60000) // Opcional: Cachear la consulta por 60 segundos
             .getMany();
 
         return entities.map(entity => CompanyMapper.toDomain(entity));

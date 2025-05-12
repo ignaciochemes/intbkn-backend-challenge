@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import { AppModule } from './Infrastructure/Modules/AppModule';
@@ -15,6 +15,26 @@ async function bootstrap() {
         new ValidationPipe({
             whitelist: true,
             forbidNonWhitelisted: true,
+            transform: true, // Habilita la transformación automática
+            transformOptions: {
+                enableImplicitConversion: false, // Evita conversiones implícitas
+            },
+            stopAtFirstError: false, // Recoge todos los errores, no solo el primero
+            exceptionFactory: (errors) => {
+                // Personaliza los mensajes de error para mayor claridad
+                const formattedErrors = errors.map(error => {
+                    const constraints = error.constraints;
+                    return {
+                        property: error.property,
+                        value: error.value,
+                        constraints: constraints ? Object.values(constraints) : []
+                    };
+                });
+                return new BadRequestException({
+                    message: 'Validation failed',
+                    errors: formattedErrors
+                });
+            }
         }),
     );
 

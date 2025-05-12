@@ -80,18 +80,23 @@ export class TransferRepository implements ITransferRepository {
     }
 
     async findCompaniesWithTransfersLastMonth(): Promise<string[]> {
-        const today = new Date();
-        const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-
+        // Consulta optimizada con JOIN explícito y uso de índices.
         const result = await this.transferRepository
             .createQueryBuilder('transfer')
-            .innerJoin('transfer.companyId', 'company')
+            .innerJoin('transfer.companyId', 'company', 'company.deleted_at IS NULL AND company.is_active = :isActive', { isActive: true })
             .select('DISTINCT company.uuid', 'uuid')
-            .where('transfer.transfer_date >= :startDate', { startDate: firstDayOfLastMonth })
-            .andWhere('transfer.transfer_date < :endDate', { endDate: firstDayOfCurrentMonth })
+            .where(`
+                transfer.transfer_date >= date_trunc('month', now()) - interval '1 month' AND 
+                transfer.transfer_date < date_trunc('month', now())    
+                `)
             .andWhere('transfer.deleted_at IS NULL')
+            .andWhere('transfer.status IN (:...validStatuses)', { validStatuses: [TransferStatus.COMPLETED, TransferStatus.PENDING] })
+            .cache(60000) // Opcional: Cachear la consulta por 60 segundos
             .getRawMany();
+
+        if (!result || result.length === 0) {
+            return [];
+        }
 
         return result.map(item => item.uuid);
     }
