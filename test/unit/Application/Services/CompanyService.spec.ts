@@ -6,6 +6,25 @@ import { Company } from '../../../../src/Domain/Entities/Company';
 import { CreateCompanyDto } from '../../../../src/Application/Dtos/CreateCompanyDto';
 import HttpCustomException from '../../../../src/Infrastructure/Exceptions/HttpCustomException';
 
+// Mock de la clase BaseDto para que los DTOs hereden correctamente
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
+
 describe('CompanyService', () => {
     let service: CompanyService;
     let companyRepository: any;
@@ -89,13 +108,13 @@ describe('CompanyService', () => {
 
     describe('createCompany', () => {
         it('should create a company successfully', async () => {
-            const createCompanyDto: CreateCompanyDto = {
-                cuit: '30-71659554-9',
-                businessName: 'New Company',
-                address: 'Test Address',
-                contactEmail: 'test@example.com',
-                contactPhone: '1234567890',
-            };
+            // Usar el constructor real para obtener todas las propiedades y métodos heredados
+            const createCompanyDto = new CreateCompanyDto();
+            createCompanyDto.cuit = '30-71659554-9';
+            createCompanyDto.businessName = 'New Company';
+            createCompanyDto.address = 'Test Address';
+            createCompanyDto.contactEmail = 'test@example.com';
+            createCompanyDto.contactPhone = '1234567890';
 
             companyRepository.findByCuit.mockResolvedValue(null);
             companyRepository.save.mockImplementation((company: Company): Promise<Company> => Promise.resolve(company));
@@ -109,10 +128,10 @@ describe('CompanyService', () => {
         });
 
         it('should throw exception when company with CUIT already exists', async () => {
-            const createCompanyDto: CreateCompanyDto = {
-                cuit: '30-71659554-9',
-                businessName: 'New Company',
-            };
+            // Usar el constructor real para obtener todas las propiedades y métodos heredados
+            const createCompanyDto = new CreateCompanyDto();
+            createCompanyDto.cuit = '30-71659554-9';
+            createCompanyDto.businessName = 'New Company';
 
             companyRepository.findByCuit.mockResolvedValue(mockCompany());
 

@@ -136,7 +136,7 @@ export class CreateTransferDto extends BaseDto {
     @IsNotEmpty({ message: 'Company ID is required' })
     @IsString({ message: 'Company ID must be a string' })
     @IsUUID('4', { message: 'Company ID must be a valid UUID' })
-    readonly companyId: string;
+    public companyId: string;
 
     @ApiProperty({
         description: 'Cuenta de origen para la transferencia',
@@ -196,7 +196,7 @@ export class CreateTransferDto extends BaseDto {
         const dto = new CreateTransferDto();
         return dto.sanitizeText(value);
     })
-    readonly description?: string;
+    public description?: string;
 
     @ApiPropertyOptional({
         description: 'ID de referencia para la transferencia',
@@ -214,7 +214,7 @@ export class CreateTransferDto extends BaseDto {
         // Normalizar referenceId (eliminar espacios, convertir a mayúsculas)
         return value.trim().toUpperCase();
     })
-    readonly referenceId?: string;
+    public referenceId?: string;
 
     @ApiPropertyOptional({
         description: 'Estado de la transferencia',
@@ -224,7 +224,7 @@ export class CreateTransferDto extends BaseDto {
     })
     @IsOptional()
     @IsEnum(TransferStatus, { message: 'Invalid transfer status' })
-    readonly status?: TransferStatus;
+    public status?: TransferStatus;
 
     @ApiPropertyOptional({
         description: 'Código de moneda en formato ISO 4217',
@@ -240,5 +240,5 @@ export class CreateTransferDto extends BaseDto {
         message: 'Currency code is not valid. Please provide a valid 3-letter ISO currency code.'
     })
     @Transform(({ value }: TransformFnParams) => value ? value.toUpperCase() : value)
-    readonly currency?: string;
+    public currency?: string;
 }

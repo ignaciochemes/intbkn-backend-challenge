@@ -9,6 +9,25 @@ import { GenericResponse } from '../../../../src/Application/Dtos/GenericRespons
 import { PaginatedResponseDto } from '../../../../src/Application/Dtos/PaginatedResponseDto';
 import { TransferStatus } from '../../../../src/Shared/Enums/TransferStatusEnum';
 
+// Mock de la clase BaseDto para que los DTOs hereden correctamente
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
+
 describe('TransferController', () => {
     let controller: TransferController;
     let transferService: any;
@@ -73,15 +92,15 @@ describe('TransferController', () => {
 
     describe('createTransfer', () => {
         it('should create a transfer successfully', async () => {
-            const createTransferDto: CreateTransferDto = {
-                amount: 1000,
-                companyId: 'test-uuid-1234',
-                debitAccount: '12345678',
-                creditAccount: '87654321',
-                description: 'Test transfer',
-                referenceId: 'REF-001',
-                currency: 'ARS',
-            };
+            // Usar el constructor real para obtener todas las propiedades y métodos heredados
+            const createTransferDto = new CreateTransferDto();
+            createTransferDto.amount = 1000;
+            createTransferDto.companyId = 'test-uuid-1234';
+            createTransferDto.debitAccount = '12345678';
+            createTransferDto.creditAccount = '87654321';
+            createTransferDto.description = 'Test transfer';
+            createTransferDto.referenceId = 'REF-001';
+            createTransferDto.currency = 'ARS';
 
             const genericResponse = new GenericResponse('Transfer created successfully');
             transferService.createTransfer.mockResolvedValue(genericResponse);

@@ -85,7 +85,7 @@ export class CreateCompanyDto extends BaseDto {
         if (clean.length !== 11) return value;
         return `${clean.substr(0, 2)}-${clean.substr(2, 8)}-${clean.substr(10, 1)}`;
     })
-    readonly cuit: string;
+    public cuit: string;
 
     @ApiProperty({
         description: 'Nombre o razón social de la empresa',
@@ -109,7 +109,7 @@ export class CreateCompanyDto extends BaseDto {
         const dto = new CreateCompanyDto();
         return dto.sanitizeText(value);
     })
-    readonly businessName: string;
+    public businessName: string;
 
     @ApiPropertyOptional({
         description: 'Dirección física de la empresa',
@@ -126,7 +126,7 @@ export class CreateCompanyDto extends BaseDto {
         if (!value) return value;
         return value.trim().replace(/\s+/g, ' ');
     })
-    readonly address?: string;
+    public address?: string;
 
     @ApiPropertyOptional({
         description: 'Correo electrónico de contacto',
@@ -137,7 +137,7 @@ export class CreateCompanyDto extends BaseDto {
     @IsEmail({}, { message: 'Invalid email format' })
     @MaxLength(100, { message: 'Email must not exceed 100 characters' })
     @Transform(({ value }: TransformFnParams) => value ? value.toLowerCase().trim() : value)
-    readonly contactEmail?: string;
+    public contactEmail?: string;
 
     @ApiPropertyOptional({
         description: 'Número de teléfono de contacto',
@@ -153,5 +153,5 @@ export class CreateCompanyDto extends BaseDto {
         if (!value) return value;
         return value.toLowerCase().trim();
     })
-    readonly contactPhone?: string;
+    public contactPhone?: string;
 }

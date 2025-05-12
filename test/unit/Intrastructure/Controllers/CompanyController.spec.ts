@@ -5,6 +5,25 @@ import { CompanyResponseDto } from '../../../../src/Application/Dtos/CompanyResp
 import { CreateCompanyDto } from '../../../../src/Application/Dtos/CreateCompanyDto';
 import { GenericResponse } from '../../../../src/Application/Dtos/GenericResponseDto';
 
+// Mock de la clase BaseDto para que los DTOs hereden correctamente
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
+
 describe('CompanyController', () => {
     let controller: CompanyController;
     let companyService: any;
@@ -48,13 +67,13 @@ describe('CompanyController', () => {
 
     describe('createCompany', () => {
         it('should create a company successfully', async () => {
-            const createCompanyDto: CreateCompanyDto = {
-                cuit: '30-71659554-9',
-                businessName: 'Test Company',
-                address: 'Test Address',
-                contactEmail: 'test@example.com',
-                contactPhone: '1234567890',
-            };
+            // Usar el constructor real para obtener todas las propiedades y métodos heredados
+            const createCompanyDto = new CreateCompanyDto();
+            createCompanyDto.cuit = '30-71659554-9';
+            createCompanyDto.businessName = 'Test Company';
+            createCompanyDto.address = 'Test Address';
+            createCompanyDto.contactEmail = 'test@example.com';
+            createCompanyDto.contactPhone = '1234567890';
 
             const genericResponse = new GenericResponse('Company created successfully');
             companyService.createCompany.mockResolvedValue(genericResponse);

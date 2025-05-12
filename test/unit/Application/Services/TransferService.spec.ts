@@ -9,6 +9,25 @@ import { CreateTransferDto } from '../../../../src/Application/Dtos/CreateTransf
 import { FindTransferQueryRequest } from '../../../../src/Application/Dtos/FindTransferQueryRequest';
 import HttpCustomException from '../../../../src/Infrastructure/Exceptions/HttpCustomException';
 
+// Mock de la clase BaseDto para que los DTOs hereden correctamente
+jest.mock('../../../../src/Application/Dtos/BaseDto', () => {
+    return {
+        BaseDto: class {
+            sanitizeText(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeIdentifier(text: string | null | undefined): string | undefined {
+                return text;
+            }
+
+            normalizeAccountNumber(account: string | null | undefined): string | undefined {
+                return account;
+            }
+        }
+    };
+});
+
 describe('TransferService', () => {
     let service: TransferService;
     let transferRepository: any;
@@ -123,15 +142,15 @@ describe('TransferService', () => {
 
     describe('createTransfer', () => {
         it('should create a transfer successfully', async () => {
-            const createTransferDto: CreateTransferDto = {
-                amount: 1000,
-                companyId: 'test-uuid-1234',
-                debitAccount: '12345678',
-                creditAccount: '87654321',
-                description: 'Test transfer',
-                referenceId: 'REF-001',
-                currency: 'ARS',
-            };
+            // Usar el constructor real para obtener todas las propiedades y métodos heredados
+            const createTransferDto = new CreateTransferDto();
+            createTransferDto.amount = 1000;
+            createTransferDto.companyId = 'test-uuid-1234';
+            createTransferDto.debitAccount = '12345678';
+            createTransferDto.creditAccount = '87654321';
+            createTransferDto.description = 'Test transfer';
+            createTransferDto.referenceId = 'REF-001';
+            createTransferDto.currency = 'ARS';
 
             companyRepository.findById.mockResolvedValue(mockCompany());
             transferRepository.save.mockImplementation((transfer: Transfer): Promise<Transfer> => Promise.resolve(transfer));
@@ -145,12 +164,11 @@ describe('TransferService', () => {
         });
 
         it('should throw exception when company not found', async () => {
-            const createTransferDto: CreateTransferDto = {
-                amount: 1000,
-                companyId: 'not-found-uuid',
-                debitAccount: '12345678',
-                creditAccount: '87654321',
-            };
+            const createTransferDto = new CreateTransferDto();
+            createTransferDto.amount = 1000;
+            createTransferDto.companyId = 'not-found-uuid';
+            createTransferDto.debitAccount = '12345678';
+            createTransferDto.creditAccount = '87654321';
 
             companyRepository.findById.mockResolvedValue(null);
 
@@ -160,12 +178,11 @@ describe('TransferService', () => {
         });
 
         it('should throw exception when amount is negative', async () => {
-            const createTransferDto: CreateTransferDto = {
-                amount: -1000,
-                companyId: 'test-uuid-1234',
-                debitAccount: '12345678',
-                creditAccount: '87654321',
-            };
+            const createTransferDto = new CreateTransferDto();
+            createTransferDto.amount = -1000;
+            createTransferDto.companyId = 'test-uuid-1234';
+            createTransferDto.debitAccount = '12345678';
+            createTransferDto.creditAccount = '87654321';
 
             await expect(service.createTransfer(createTransferDto)).rejects.toThrow();
         });
