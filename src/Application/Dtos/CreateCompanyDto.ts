@@ -3,44 +3,6 @@ import { Transform, TransformFnParams } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength, Validate, ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator";
 import { BaseDto } from "./BaseDto";
 
-@ValidatorConstraint({ name: 'isCuitValid', async: false })
-export class IsCuitValidConstraint implements ValidatorConstraintInterface {
-    validate(cuit: string, args: ValidationArguments) {
-        if (!cuit) return false;
-
-        // Limpiar el CUIT para trabajar solo con dígitos
-        const cleanCuit = cuit.replace(/\D/g, '');
-        if (cleanCuit.length !== 11) return false;
-
-        // Verificar que comience con prefijo válido
-        const validPrefixes = ['20', '23', '24', '25', '26', '27', '30', '33', '34'];
-        const prefix = cleanCuit.substring(0, 2);
-        if (!validPrefixes.includes(prefix)) return false;
-
-        // Algoritmo para validar el dígito verificador de CUIT
-        const digits = cleanCuit.split('').map(d => parseInt(d));
-        const verifier = digits.pop(); // Último dígito es el verificador
-
-        const multipliers = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-        let sum = 0;
-
-        for (let i = 0; i < multipliers.length; i++) {
-            sum += digits[i] * multipliers[i];
-        }
-
-        let calculatedVerifier = 11 - (sum % 11);
-        if (calculatedVerifier === 11) calculatedVerifier = 0;
-        if (calculatedVerifier === 10) calculatedVerifier = 9;
-        console.log(calculatedVerifier);
-        console.log(verifier);
-        return calculatedVerifier === verifier;
-    }
-
-    defaultMessage(args: ValidationArguments) {
-        return 'CUIT is not valid. Please provide a valid Argentine tax ID with correct check digit.';
-    }
-}
-
 // Validador personalizado para caracteres peligrosos en texto
 @ValidatorConstraint({ name: 'noMaliciousChars', async: false })
 export class NoMaliciousCharsConstraint implements ValidatorConstraintInterface {
@@ -74,9 +36,6 @@ export class CreateCompanyDto extends BaseDto {
     @IsString({ message: 'CUIT must be a string' })
     @Matches(/^(20|23|24|25|26|27|30|33|34)(-\d{8}-\d{1}|\d{9})$/, {
         message: 'CUIT must follow the pattern: 2X-XXXXXXXX-X or 3XXXXXXXXX',
-    })
-    @Validate(IsCuitValidConstraint, {
-        message: 'CUIT is not valid. Please provide a valid Argentine tax ID with correct check digit.'
     })
     @Transform(({ value }: TransformFnParams) => {
         if (!value) return value;
